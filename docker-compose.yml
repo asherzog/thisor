@@ -1,0 +1,12 @@
+version: "3.9"
+name: 'thisor'
+services:
+  server:
+    build:
+      context: ./
+      dockerfile: ./docker/server/dockerfile
+    working_dir: /cmd
+    ports:
+      - "127.0.0.1:8080:$PORT"
+    env_file:
+      - .env
