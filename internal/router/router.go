@@ -18,7 +18,7 @@ type Router struct {
 
 func NewRouter(lg *slog.Logger) (http.Handler, error) {
 	ctx := context.Background()
-	dbClient, err := db.NewClient(ctx)
+	dbClient, err := db.NewClient(ctx, lg)
 	if err != nil {
 		return nil, err
 	}
@@ -30,7 +30,8 @@ func NewRouter(lg *slog.Logger) (http.Handler, error) {
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("/ping", router.ping())
-	mux.HandleFunc("/schedule", router.GetSchedule())
+	mux.HandleFunc("/schedule/week/{id}", router.GetWeek())
+	mux.HandleFunc("/schedule", router.handleScheduleRequest())
 	mux.HandleFunc("/odds/{id}", router.GetOdds())
 	mux.HandleFunc("/games/{id}", router.GetGame())
 
