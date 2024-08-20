@@ -1,1 +1,6 @@
 /bin
+.gitignore
+.github
+Makefile
+LICENSE
+README.md

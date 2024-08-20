@@ -14,9 +14,15 @@ type options struct {
 }
 
 func runHttp(opts options) error {
+	router, err := router.NewRouter(opts.lg)
+	if err != nil {
+		opts.lg.Error("Failed to initialize router")
+		return err
+	}
+
 	s := http.Server{
 		Addr:         opts.listenAddr,
-		Handler:      router.NewRouter(opts.lg),
+		Handler:      router,
 		ReadTimeout:  10 * time.Second,
 		WriteTimeout: 10 * time.Second,
 	}

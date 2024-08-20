@@ -1,0 +1,10 @@
+FROM node:20.16.0-alpine3.20
+
+RUN apk add --no-cache openjdk11
+RUN apk add --no-cache bash
+
+RUN npm install -g firebase-tools@10.9.2
+
+COPY ./firebase.json ./ 
+
+ENTRYPOINT ["firebase","emulators:start", "--project=thisor", "--import=./data/export", "--export-on-exit=./data/export"]

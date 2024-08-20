@@ -3,10 +3,25 @@ name: 'thisor'
 services:
   server:
     build:
-      context: ./
       dockerfile: ./docker/server/dockerfile
     working_dir: /cmd
     ports:
       - "127.0.0.1:8080:$PORT"
     env_file:
       - .env
+    depends_on:
+      - firestore
+
+  firestore:
+    build:
+      context: ./docker/firebase
+      dockerfile: dockerfile
+    env_file:
+      - .env
+    ports:
+      - "127.0.0.1:8787:8787"
+      - "127.0.0.1:4000:4000"
+    volumes:
+       - ./docker/firebase/cache:/root/.cache/:rw
+       - ./docker/firebase/data:/data:rw
+    restart: unless-stopped

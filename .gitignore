@@ -1,2 +1,4 @@
 /bin
 .env
+/docker/firebase/cache
+/docker/firebase/data
