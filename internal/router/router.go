@@ -7,6 +7,7 @@ import (
 
 	"github.com/asherzog/thisor/internal/db"
 	"github.com/asherzog/thisor/internal/espn"
+	"github.com/go-chi/chi"
 	sloghttp "github.com/samber/slog-http"
 )
 
@@ -14,6 +15,11 @@ type Router struct {
 	logger     *slog.Logger
 	espnClient *espn.Client
 	db         *db.DB
+}
+
+type ErrorReturn struct {
+	Status int    `json:"status"`
+	Msg    string `json:"msg"`
 }
 
 func NewRouter(lg *slog.Logger) (http.Handler, error) {
@@ -27,15 +33,20 @@ func NewRouter(lg *slog.Logger) (http.Handler, error) {
 	router.espnClient = espn.NewClient()
 	router.db = dbClient
 
-	mux := http.NewServeMux()
+	// mux := http.NewServeMux()
+	r := chi.NewRouter()
+	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("ok"))
+	})
 
-	mux.HandleFunc("/ping", router.ping())
-	mux.HandleFunc("/schedule/week/{id}", router.GetWeek())
-	mux.HandleFunc("/schedule", router.handleScheduleRequest())
-	mux.HandleFunc("/odds/{id}", router.GetOdds())
-	mux.HandleFunc("/games/{id}", router.GetGame())
+	r.Get("/ping", router.ping())
+	r.Mount("/picks", router.Picks())
+	r.Mount("/schedule", router.Schedule())
+	r.Mount("/odds", router.Odds())
+	r.Mount("/users", router.Users())
+	r.Mount("/leagues", router.Leagues())
 
-	handler := sloghttp.Recovery(mux)
+	handler := sloghttp.Recovery(r)
 	handler = sloghttp.New(lg)(handler)
 
 	return handler, nil
@@ -48,6 +59,6 @@ func (Router) ping() http.HandlerFunc {
 			return
 		}
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("ok"))
+		w.Write([]byte("pong"))
 	}
 }

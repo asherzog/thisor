@@ -53,7 +53,7 @@ func (d *DB) GetWeek(ctx context.Context, id int) (*espn.Schedule, error) {
 	}
 
 	for _, game := range d.Schedule.Games {
-		if game.Week == id {
+		if game.Week == id && game.Type == 2 {
 			week.Games = append(week.Games, game)
 		}
 	}
@@ -62,4 +62,20 @@ func (d *DB) GetWeek(ctx context.Context, id int) (*espn.Schedule, error) {
 		return nil, errors.New("invalid week")
 	}
 	return &week, nil
+}
+
+func (d DB) GetGame(ctx context.Context, id string) (espn.Game, error) {
+	var game espn.Game
+	if d.Schedule == nil {
+		d.lg.Warn("no in memory schedule")
+		d.GetSchedule(ctx, "2024")
+	}
+
+	for _, game := range d.Schedule.Games {
+		if game.ID == id {
+			return game, nil
+		}
+	}
+
+	return game, errors.New("game not found")
 }

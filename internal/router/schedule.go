@@ -4,43 +4,47 @@ import (
 	"encoding/json"
 	"net/http"
 	"strconv"
-	"strings"
+
+	"github.com/go-chi/chi"
 )
 
-func (router Router) handleScheduleRequest() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
+func (router Router) Schedule() chi.Router {
+	r := chi.NewRouter()
+	r.Get("/", router.GetSchedule())
+	r.Post("/", router.PostSchedule())
+	r.Put("/", router.PostSchedule())
 
-		switch strings.ToLower(r.Method) {
-		case "get":
-			router.GetSchedule(w, r)
-		case "put":
-			router.PutSchedule(w, r)
-		default:
-			router.logger.Error("unsupported method", "method", r.Method, "request", r.Body)
-			w.WriteHeader(http.StatusMethodNotAllowed)
-			json.NewEncoder(w).Encode("unsupported")
-		}
-	}
+	r.Route("/week/{id}", func(r chi.Router) {
+		r.Get("/", router.GetWeek()) // GET /schedule/weeks/{id}
+	})
+
+	r.Route("/games/{id}", func(r chi.Router) {
+		r.Get("/", router.GetGame()) // GET /schedule/games/{id}
+	})
+
+	return r
 }
 
-func (router Router) GetSchedule(w http.ResponseWriter, r *http.Request) {
-	res, err := router.db.GetSchedule(r.Context(), "2024")
-	if err != nil {
-		router.logger.Error("db error", "err", err.Error())
-		router.logger.Info("attempting to fetch from espn")
-		res, err = router.espnClient.GetSchedule()
+func (router Router) GetSchedule() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		res, err := router.db.GetSchedule(r.Context(), "2024")
 		if err != nil {
-			router.logger.Error("espn error", "err", err.Error())
-			// TODO: check for different types of errors
-			w.WriteHeader(http.StatusBadRequest)
+			router.logger.Error("db error", "err", err.Error())
+			router.logger.Info("attempting to fetch from espn")
+			res, err = router.espnClient.GetSchedule()
+			if err != nil {
+				router.logger.Error("espn error", "err", err.Error())
+				// TODO: check for different types of errors
+				w.WriteHeader(http.StatusBadRequest)
+			}
 		}
+		json.NewEncoder(w).Encode(res)
 	}
-	json.NewEncoder(w).Encode(res)
 }
 
 func (router Router) GetWeek() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		s := r.PathValue("id")
+		s := chi.URLParam(r, "id")
 		// string to int
 		id, err := strconv.Atoi(s)
 		if err != nil {
@@ -60,17 +64,31 @@ func (router Router) GetWeek() http.HandlerFunc {
 	}
 }
 
-func (router Router) PutSchedule(w http.ResponseWriter, r *http.Request) {
-	res, err := router.espnClient.GetSchedule()
-	if err != nil {
-		router.logger.Error("espn error", "err", err.Error())
-		// TODO: check for different types of errors
-		w.WriteHeader(http.StatusBadRequest)
-		return
+func (router Router) PostSchedule() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		res, err := router.espnClient.GetSchedule()
+		if err != nil {
+			router.logger.Error("espn error", "err", err.Error())
+			// TODO: check for different types of errors
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+		schedule, err := router.db.AddSchedule(r.Context(), res)
+		if err != nil {
+			router.logger.Error("db error", "err", err.Error())
+		}
+		json.NewEncoder(w).Encode(schedule)
 	}
-	schedule, err := router.db.AddSchedule(r.Context(), res)
-	if err != nil {
-		router.logger.Error("db error", "err", err.Error())
+}
+
+func (router Router) GetGame() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		res, err := router.db.GetGame(r.Context(), chi.URLParam(r, "id"))
+		if err != nil {
+			router.logger.Error("db error", "err", err.Error())
+			// TODO: check for different types of errors
+			w.WriteHeader(http.StatusBadRequest)
+		}
+		json.NewEncoder(w).Encode(res)
 	}
-	json.NewEncoder(w).Encode(schedule)
 }
