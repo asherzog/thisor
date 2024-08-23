@@ -10,10 +10,11 @@ import (
 )
 
 type DB struct {
-	ProjectID string `env:"FIRESTORE_PROJECT_ID"`
-	Client    *firestore.Client
-	Schedule  *espn.Schedule
-	lg        *slog.Logger
+	ProjectID      string `env:"FIRESTORE_PROJECT_ID"`
+	Client         *firestore.Client
+	Schedule       *espn.Schedule
+	lg             *slog.Logger
+	SessionManager *SessionManager
 }
 
 func NewClient(ctx context.Context, lg *slog.Logger) (*DB, error) {
@@ -27,7 +28,7 @@ func NewClient(ctx context.Context, lg *slog.Logger) (*DB, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	db.Client = client
+	db.SessionManager = db.NewSessionManager()
 	return &db, nil
 }
