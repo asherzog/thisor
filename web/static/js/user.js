@@ -23,5 +23,16 @@ $(document).ready(function() {
         }
     });
   });
+  $('.parentDiv').delegate('.childDiv', 'click', function() {
+    $(this).addClass('selection').siblings().removeClass('selection');
+    var selectedValues = $(this).data('value');
+    console.log(selectedValues);
+  });
+  $("#submit").click(function() { 
+    var data = $('.selection').map(function() {
+      return {game: $(this).data('game'), pick: $(this).data('value')};
+    }).get();
+    console.log(data);
+  });
 });
 

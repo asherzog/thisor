@@ -8,18 +8,19 @@
 	<link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
 	<link href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
     <link href="/static/css/app.css" rel="stylesheet">
+    <script src="/static/js/user.js"> </script>
 </head>
 {{template "header" .}}
 <body class="home">
-    <div class="container">
+    <div class="container picks">
         {{range $val := .schedule.Games}}
             <div class="card">
-                <div class="row g-0">
-                    <div class="col-sm-6 hometeam screen">
+                <div class="row g-0 parentDiv">
+                    <div id="pick-{{$val.Home.ID}}" data-game="{{$val.ID}}" data-value="{{$val.Home.ID}}" class="col-sm-6 hometeam screen childDiv">
                         <img src="{{$val.Home.Logo}}" />
                         <p>Home</p>
                     </div>
-                    <div class="col-sm-6 awayteam screen">
+                    <div  id="pick-{{$val.Away.ID}}" data-game="{{$val.ID}}" data-value="{{$val.Away.ID}}"class="col-sm-6 awayteam screen childDiv">
                         <img src="{{$val.Away.Logo}}" />
                         <p>Away</p>
                     </div>
@@ -31,6 +32,7 @@
             </div>
         {{end}}
     </div>
+    <button id="submit" class="btn">submit</button>
 </body>
 </html>
 {{end}}
