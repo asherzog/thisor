@@ -16,8 +16,9 @@
     {{template "header" .}}
     <nav>
         <ul>
+            weeks:
             {{range $i := .weeks}}
-            <li><a href="/week/{{$i}}">{{$i}}</a></li>
+            <li><a href="/week/{{$i}}?lid={{$.league.ID}}">{{$i}}</a></li>
             {{end}}
         </ul>
     </nav>

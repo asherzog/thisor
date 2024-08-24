@@ -58,6 +58,8 @@ func (web Web) Week(auth *authenticator.Authenticator) http.HandlerFunc {
 		}
 
 		user["schedule"] = week
+		lid := r.URL.Query().Get("lid")
+		user["lid"] = lid
 
 		workDir, _ := os.Getwd()
 		base := filepath.Join(workDir, "/web/template/header.html")

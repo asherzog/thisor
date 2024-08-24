@@ -11,6 +11,7 @@
     <script src="/static/js/user.js"> </script>
 </head>
 {{template "header" .}}
+<a href="/league/{{ .lid }}">back</a>
 <body class="home">
     <div class="container picks">
         {{range $val := .schedule.Games}}
