@@ -56,6 +56,7 @@ func (web Web) Schedule(auth *authenticator.Authenticator) http.HandlerFunc {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 		prof["schedule"] = schedule
+		prof["last"] = ""
 
 		workDir, _ := os.Getwd()
 		base := filepath.Join(workDir, "/web/template/header.html")

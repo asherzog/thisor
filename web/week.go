@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"sort"
 
 	"github.com/asherzog/thisor/internal/authenticator"
 	"github.com/asherzog/thisor/internal/espn"
@@ -56,7 +57,16 @@ func (web Web) Week(auth *authenticator.Authenticator) http.HandlerFunc {
 		if err := json.Unmarshal(body, &week); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
-
+		l := len(week.Games)
+		if l == 0 {
+			web.lg.Error("no games")
+			http.Error(w, "no games in week", http.StatusInternalServerError)
+		}
+		sort.Slice(week.Games, func(i, j int) bool {
+			return week.Games[i].Date < week.Games[j].Date
+		})
+		last := week.Games[len(week.Games)-1].ID
+		user["last"] = last
 		user["schedule"] = week
 		lid := r.URL.Query().Get("lid")
 		user["lid"] = lid

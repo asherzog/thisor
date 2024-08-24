@@ -17,19 +17,27 @@
         {{range $val := .schedule.Games}}
             <div class="card">
                 <div class="row g-0 parentDiv">
-                    <div id="pick-{{$val.Home.ID}}" data-game="{{$val.ID}}" data-value="{{$val.Home.ID}}" class="col-sm-6 hometeam screen childDiv">
+                    <div id="pick-{{$val.Home.ID}}" data-user="{{$.sub}}" data-game="{{$val.ID}}" data-value="{{$val.Home.ID}}" data-week="{{$val.Week}}" class="col-sm-6 hometeam screen childDiv">
                         <img src="{{$val.Home.Logo}}" />
                         <p>Home</p>
                     </div>
-                    <div  id="pick-{{$val.Away.ID}}" data-game="{{$val.ID}}" data-value="{{$val.Away.ID}}"class="col-sm-6 awayteam screen childDiv">
+                    <div  id="pick-{{$val.Away.ID}}" data-user="{{$.sub}}" data-game="{{$val.ID}}" data-value="{{$val.Away.ID}}" data-week="{{$val.Week}}" class="col-sm-6 awayteam screen childDiv">
                         <img src="{{$val.Away.Logo}}" />
                         <p>Away</p>
                     </div>
                 </div>
                 <div class="row g-0 pad">
+                    <p>{{$val.Date}}</p>
                     <p>{{$val.Odds.Details}}</p>
                     <p>O/U: {{$val.Odds.OverUnder}}</p>
                 </div>
+                {{if eq $val.ID $.last}}
+                <label for="win">win score:</label>
+                <input type="text" id="win" name="win" required>
+
+                <label for="lose">lose score:</label>
+                <input type="text" id="lose" name="lose" required>
+                {{end}}
             </div>
         {{end}}
     </div>

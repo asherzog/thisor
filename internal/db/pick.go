@@ -13,7 +13,7 @@ type Pick struct {
 	ID        string    `json:"id"`
 	UserID    string    `json:"user_id"`
 	GameID    string    `json:"game_id"`
-	Selection espn.Team `json:"selection,required"`
+	Selection espn.Team `json:"selection"`
 	Week      int       `json:"week"`
 	WinScore  int       `json:"win_score"`
 	LoseScore int       `json:"lose_score"`
@@ -21,7 +21,7 @@ type Pick struct {
 }
 
 type PickList struct {
-	Users map[string][]Pick
+	Users map[string][]Pick `json:"users"`
 }
 
 func (p *PickList) GetUsers() map[string][]Pick {
@@ -140,6 +140,18 @@ func (d *DB) GetPicksForUser(ctx context.Context, id string) (*PickList, error) 
 		pickList.Users[id] = append(pickList.Users[id], pick)
 	}
 	return &pickList, nil
+}
+
+func (d *DB) PostPickList(ctx context.Context, picks PickList) (*PickList, error) {
+	for _, picks := range picks.Users {
+		for _, p := range picks {
+			_, err := d.CreatePick(ctx, p)
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+	return &picks, nil
 }
 
 func validateSelection(g espn.Game, p Pick) (espn.Team, error) {

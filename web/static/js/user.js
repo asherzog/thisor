@@ -25,14 +25,35 @@ $(document).ready(function() {
   });
   $('.parentDiv').delegate('.childDiv', 'click', function() {
     $(this).addClass('selection').siblings().removeClass('selection');
-    var selectedValues = $(this).data('value');
-    console.log(selectedValues);
   });
   $("#submit").click(function() { 
+    var user = ""
     var data = $('.selection').map(function() {
-      return {game: $(this).data('game'), pick: $(this).data('value')};
+      user = $(this).data('user')
+      return {
+        game_id: $(this).data('game').toString(),
+        user_id: user, 
+        selection: {id: $(this).data('value').toString()},
+        week: $(this).data('week')
+      };
     }).get();
-    console.log(data);
+    var win = $("#win").val();
+    var lose = $("#win").val();
+    var len = data.length
+    if (len > 0) {
+      data[len-1]["win_score"] = parseInt(win)
+      data[len-1]["lose_score"] = parseInt(lose)
+    }
+    $.ajax({
+      type: "POST",
+      url: "/api/picks/list",
+      data: JSON.stringify({ "users": {user:data} }),
+      contentType: "application/json; charset=utf-8",
+      dataType: "json",
+      success:function(){
+        window.location.href = "/user"
+      }
+    });
   });
 });
 

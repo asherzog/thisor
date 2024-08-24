@@ -66,5 +66,11 @@ func (d *DB) GetUser(ctx context.Context, id string) (*User, error) {
 		d.lg.Error("unable to parse user", "error", err.Error())
 		return nil, err
 	}
+	picks, err := d.GetPicksForUser(ctx, id)
+	if err != nil {
+		d.lg.Error("unable to get picks for user", "error", err.Error())
+		return nil, err
+	}
+	user.Picks = picks.Users[id]
 	return &user, nil
 }
