@@ -1,0 +1,25 @@
+{{define "league"}}
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <script src="http://code.jquery.com/jquery-3.1.0.min.js" type="text/javascript"></script>
+    
+        <!-- font awesome from BootstrapCDN -->
+        <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+        <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    
+        <script src="/static/js/js.cookie.js"></script>
+        <script src="/static/js/user.js"> </script>
+        <link href="/static/css/app.css" rel="stylesheet">
+    </head>
+    {{template "header" .}}
+    <nav>
+        <ul>
+            {{range $i := .weeks}}
+            <li><a href="/week/{{$i}}">{{$i}}</a></li>
+            {{end}}
+        </ul>
+    </nav>
+</html>
+{{end}}

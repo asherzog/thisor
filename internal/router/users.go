@@ -2,7 +2,6 @@ package router
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/asherzog/thisor/internal/db"
@@ -34,7 +33,6 @@ func (router Router) GetAllUsers() http.HandlerFunc {
 
 func (router Router) GetUser() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		fmt.Printf("\n\nGot ID: %s\n\n", chi.URLParam(r, "id"))
 		res, err := router.db.GetUser(r.Context(), chi.URLParam(r, "id"))
 		if err != nil {
 			router.logger.Error("db error", "err", err.Error())

@@ -22,7 +22,7 @@
 				<p>Your leagues:</p>
 				{{range $val := .user.Leagues}}
 					{{if $val.Name}}
-					<p>{{$val.Name}}</p>
+					<a href="/league/{{$val.ID}}">{{$val.Name}}</a>
 					{{else}}
 					<p>No leagues yet!</p>
 					{{end}}
