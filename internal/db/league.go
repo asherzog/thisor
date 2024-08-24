@@ -133,6 +133,17 @@ func (d *DB) AddUserToLeague(ctx context.Context, leagueId, userId string) (*[]U
 	if err != nil {
 		return nil, err
 	}
+
+	user.Leagues = append(user.Leagues, league)
+	_, err = d.userCollection().Doc(user.ID).Update(ctx, []firestore.Update{
+		{
+			Path:  "Leagues",
+			Value: user.Leagues,
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
 	return &league.Users, nil
 }
 

@@ -10,5 +10,18 @@ $(document).ready(function() {
         }
     });
   });
+  $('.joinLeagueForm').submit(function(e){
+    e.preventDefault();
+    let league = $('#name').val();
+
+    $.ajax({
+        url: '/api/leagues/' + league + '/users',
+        type: 'put',
+        data:$('.joinLeagueForm').serialize(),
+        success:function(){
+          window.location.href = "/user"
+        }
+    });
+  });
 });
 

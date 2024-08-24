@@ -19,6 +19,14 @@
 			<div class="logged-in-box auth0-box logged-in">
 				<h2>Welcome {{ .nickname }}</h2>
 				<p>ID: {{ .user.ID}}</p>
+				<p>Your leagues:</p>
+				{{range $val := .user.Leagues}}
+					{{if $val.Name}}
+					<p>{{$val.Name}}</p>
+					{{else}}
+					<p>No leagues yet!</p>
+					{{end}}
+				{{end}}
 			</div>
 		</div>
 	</div>

@@ -53,6 +53,7 @@ func NewRouter(lg *slog.Logger) (http.Handler, error) {
 	r.Mount("/callback", router.Callback(router.auth))
 	r.Mount("/user", router.web.User(router.auth))
 	r.Mount("/create-user", router.web.UserCreate(router.auth))
+	r.Mount("/join", router.web.AddUserToLeague(router.auth))
 	r.Mount("/schedule", router.web.Schedule(router.auth))
 	r.Mount("/logout", router.Logout(router.auth))
 	r.Mount("/api", router.API())
