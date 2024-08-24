@@ -2,10 +2,12 @@ package authenticator
 
 import (
 	"context"
+	"encoding/gob"
 	"errors"
 	"os"
 
 	"github.com/coreos/go-oidc/v3/oidc"
+	"github.com/gorilla/sessions"
 	"golang.org/x/oauth2"
 )
 
@@ -13,21 +15,15 @@ import (
 type Authenticator struct {
 	*oidc.Provider
 	oauth2.Config
-	UserKey UserKeyType
+	Store   *sessions.CookieStore
+	Profile *Profile
 }
 
-type UserKeyType string
-
-func (a Authenticator) Set(ctx context.Context, value interface{}) context.Context {
-	return context.WithValue(ctx, a.UserKey, value)
-}
-
-func (a Authenticator) Get(ctx context.Context) interface{} {
-	return ctx.Value(a.UserKey)
-}
+type Profile map[string]interface{}
 
 // New instantiates the *Authenticator.
 func New() (*Authenticator, error) {
+	var store = sessions.NewCookieStore([]byte(os.Getenv("SESSION_KEY")))
 	provider, err := oidc.NewProvider(
 		context.Background(),
 		"https://"+os.Getenv("AUTH0_DOMAIN")+"/",
@@ -44,10 +40,14 @@ func New() (*Authenticator, error) {
 		Scopes:       []string{oidc.ScopeOpenID, "profile"},
 	}
 
+	// allow us to store profile in session store
+	gob.Register(Profile{})
+
 	return &Authenticator{
 		Provider: provider,
 		Config:   conf,
-		UserKey:  "user",
+		Store:    store,
+		Profile:  &Profile{},
 	}, nil
 }
 

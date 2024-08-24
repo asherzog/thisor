@@ -1,5 +1,14 @@
 $(document).ready(function() {
-    $('.btn-logout').click(function(e) {
-      Cookies.remove('auth-session');
+  $('.userCreateForm').submit(function(e){
+    e.preventDefault();
+    $.ajax({
+        url: '/api/users',
+        type: 'post',
+        data:$('.userCreateForm').serialize(),
+        success:function(){
+          window.location.href = "/home"
+        }
     });
+  });
 });
+

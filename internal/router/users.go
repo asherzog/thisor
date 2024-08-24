@@ -2,6 +2,7 @@ package router
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/asherzog/thisor/internal/db"
@@ -33,6 +34,7 @@ func (router Router) GetAllUsers() http.HandlerFunc {
 
 func (router Router) GetUser() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		fmt.Printf("\n\nGot ID: %s\n\n", chi.URLParam(r, "id"))
 		res, err := router.db.GetUser(r.Context(), chi.URLParam(r, "id"))
 		if err != nil {
 			router.logger.Error("db error", "err", err.Error())
@@ -45,14 +47,21 @@ func (router Router) GetUser() http.HandlerFunc {
 func (router Router) PostUser() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var user db.User
-		decoder := json.NewDecoder(r.Body)
-		err := decoder.Decode(&user)
+		err := r.ParseForm()
 		if err != nil {
-			router.logger.Error("invalid user request", "err", err.Error())
-			w.WriteHeader(http.StatusBadRequest)
-			json.NewEncoder(w).Encode(user)
-			return
+			decoder := json.NewDecoder(r.Body)
+			err := decoder.Decode(&user)
+			if err != nil {
+				router.logger.Error("invalid user request", "err", err.Error())
+				w.WriteHeader(http.StatusBadRequest)
+				json.NewEncoder(w).Encode(user)
+				return
+			}
+		} else {
+			user.ID = r.FormValue("id")
+			user.Name = r.FormValue("name")
 		}
+
 		res, err := router.db.CreateUser(r.Context(), user)
 		if err != nil {
 			router.logger.Error("db error", "err", err.Error())

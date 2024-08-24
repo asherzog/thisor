@@ -1,31 +1,58 @@
 package web
 
 import (
-	"fmt"
 	"html/template"
+	"log/slog"
 	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/asherzog/thisor/internal/authenticator"
 	"github.com/go-chi/chi"
 )
 
-type Web struct{}
-
-func NewClient() *Web {
-	return &Web{}
+type Web struct {
+	client     *http.Client
+	lg         *slog.Logger
+	isLoggedIn bool
 }
 
-func (Web) Serve() chi.Router {
-	r := chi.NewRouter()
+func NewClient(lg *slog.Logger) *Web {
+	client := http.Client{
+		Timeout: time.Second * 10,
+	}
+	return &Web{lg: lg, client: &client}
+}
 
-	workDir, _ := os.Getwd()
-	filesDir := http.Dir(filepath.Join(workDir, "/web"))
-	FileServer(r, "/", filesDir)
+func (web Web) Serve(auth *authenticator.Authenticator) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		session, err := auth.Store.Get(r, "jwt")
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		val := session.Values["prof"]
+		user, ok := val.(authenticator.Profile)
+		if !ok {
+			web.isLoggedIn = false
+			user = make(map[string]interface{})
+		}
+		user["path"] = "home"
 
-	return r
+		workDir, _ := os.Getwd()
+		base := filepath.Join(workDir, "/web/template/header.html")
+		h := filepath.Join(workDir, "/web/template/home.html")
+		tmpl, err := template.ParseFiles(h, base)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		if err := tmpl.ExecuteTemplate(w, "home", user); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+	}
 }
 
 func (Web) ServeStatic() chi.Router {
@@ -34,23 +61,6 @@ func (Web) ServeStatic() chi.Router {
 	filesDir := http.Dir(filepath.Join(workDir, "/web/static"))
 	FileServer(r, "/", filesDir)
 	return r
-}
-
-func (Web) User(auth *authenticator.Authenticator) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		user := auth.Get(r.Context())
-		fmt.Printf("\n\n%v\n\n", user)
-		workDir, _ := os.Getwd()
-		fp := filepath.Join(workDir, "/web/template/user.html")
-		tmpl, err := template.ParseFiles(fp)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		if err := tmpl.Execute(w, user); err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
-	}
 }
 
 // FileServer conveniently sets up a http.FileServer handler to serve

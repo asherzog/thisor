@@ -1,0 +1,36 @@
+{{define "schedule"}}
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="http://code.jquery.com/jquery-3.1.0.min.js" type="text/javascript"></script>
+
+	<!-- font awesome from BootstrapCDN -->
+	<link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+	<link href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/static/css/app.css" rel="stylesheet">
+</head>
+{{template "header" .}}
+<body class="home">
+    <div class="container">
+        {{range $val := .schedule.Games}}
+            <div class="card">
+                <div class="row g-0">
+                    <div class="col-md-6 d-flex hometeam">
+                        <img src="{{$val.Home.Logo}}" />
+                        <p>Home</p>
+                    </div>
+                    <div class="col-md-6 d-flex awayteam">
+                        <img src="{{$val.Away.Logo}}" />
+                        <p>Away</p>
+                    </div>
+                </div>
+                <div class="row g-0 pad">
+                    <p>{{$val.Odds.Details}}</p>
+                    <p>O/U: {{$val.Odds.OverUnder}}</p>
+                </div>
+            </div>
+        {{end}}
+    </div>
+</body>
+</html>
+{{end}}
