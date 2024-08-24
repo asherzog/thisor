@@ -90,22 +90,34 @@ label {
 }
 
 .container {
-  display: grid;
-  gap: 20px;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  padding: 20px;
-  max-width: 1200px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  /* grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); */
+  padding: 10px;
+  /* max-width: 1200px; */
   width: 100%;
 }
 
 .card {
   display:inline-block;
-  /* background-color: #fff; */
+  background-color: #fff;
   border-radius: 8px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   padding: 20px;
-  /* text-align: center; */
+  text-align: center;
   transition: transform 0.2s;
+  width: 32%;
+}
+
+.games {
+  display: flex;
+}
+
+@media (max-width: 770px) {
+  .card{
+    width: 100%;
+  }
 }
 
 .card:hover {

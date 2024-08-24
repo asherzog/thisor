@@ -15,11 +15,11 @@
         {{range $val := .schedule.Games}}
             <div class="card">
                 <div class="row g-0">
-                    <div class="col-md-6 d-flex hometeam">
+                    <div class="col-sm-6 hometeam screen">
                         <img src="{{$val.Home.Logo}}" />
                         <p>Home</p>
                     </div>
-                    <div class="col-md-6 d-flex awayteam">
+                    <div class="col-sm-6 awayteam screen">
                         <img src="{{$val.Away.Logo}}" />
                         <p>Away</p>
                     </div>
