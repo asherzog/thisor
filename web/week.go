@@ -7,6 +7,7 @@ import (
 	"html/template"
 	"io"
 	"net/http"
+	"net/url"
 	"os"
 	"path/filepath"
 	"sort"
@@ -33,7 +34,10 @@ func (web *Web) Week(auth *authenticator.Authenticator) http.HandlerFunc {
 		prof["path"] = "week"
 
 		// get user info and picks
-		uid := prof["sub"].(string)
+		uid, _ := url.PathUnescape(r.URL.Query().Get("uid"))
+		if uid == "" {
+			uid = prof["sub"].(string)
+		}
 		user, err := web.getUser(r.Context(), uid)
 		if err != nil {
 			web.lg.Error("user request error", "error", err.Error())

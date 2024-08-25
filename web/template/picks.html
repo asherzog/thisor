@@ -12,6 +12,7 @@
 </head>
 {{template "league" .}}
 <div class="spacer"></div>
+<a id="backtoleague" href="/league/{{ .lid }}">back</a>
 <body class="home">
     <div class="container picks">
         {{range $val := .schedule.Games}}

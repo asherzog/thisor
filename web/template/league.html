@@ -18,7 +18,11 @@
         <ul>
             weeks:
             {{range $i := .weeks}}
-            <li><a href="/week/{{$i}}?lid={{$.lid}}">{{$i}}</a></li>
+                {{if $.withUser}}
+                <li><a href="/week/{{$i}}?lid={{$.lid}}&uid={{$.uid}}">{{$i}}</a></li>
+                {{else}}
+                <li><a href="/week/{{$i}}?lid={{$.lid}}">{{$i}}</a></li>
+                {{end}}
             {{end}}
         </ul>
     </nav>
@@ -30,7 +34,7 @@
             <td rowspan="4">Users:</td>
             {{range $u := .league.Users}}
             <tr>
-                <td><a href="/user/{{$u.ID}}">{{$u.Name}}</a></td>
+                <td><a href="/user/{{$u.ID}}?lid={{$.lid}}&uid={{$u.ID}}">{{$u.Name}}</a></td>
             </tr>
             {{end}}
         </tr>

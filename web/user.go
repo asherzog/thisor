@@ -29,9 +29,12 @@ func (web *Web) User(auth *authenticator.Authenticator) http.HandlerFunc {
 		prof["path"] = "user"
 
 		uid, _ := url.PathUnescape(chi.URLParam(r, "id"))
+		prof["withUser"] = true
 		if uid == "" {
 			uid = prof["sub"].(string)
+			prof["withUser"] = false
 		}
+		prof["uid"] = uid
 		user, err := web.getUser(r.Context(), uid)
 		if err != nil {
 			web.lg.Error("user request error", "error", err.Error())
@@ -40,10 +43,25 @@ func (web *Web) User(auth *authenticator.Authenticator) http.HandlerFunc {
 
 		prof["user"] = user
 
+		if len(web.weeks) == 0 {
+			for i := 1; i < 19; i++ {
+				web.weeks = append(web.weeks, i)
+			}
+		}
+		prof["weeks"] = web.weeks
+
+		prof["withLeague"] = false
+		lid := r.URL.Query().Get("lid")
+		if lid != "" {
+			prof["withLeague"] = true
+			prof["lid"] = lid
+		}
+
 		workDir, _ := os.Getwd()
 		base := filepath.Join(workDir, "/web/template/header.html")
+		league := filepath.Join(workDir, "/web/template/league.html")
 		u := filepath.Join(workDir, "/web/template/user.html")
-		tmpl, err := template.ParseFiles(u, base)
+		tmpl, err := template.ParseFiles(u, league, base)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return

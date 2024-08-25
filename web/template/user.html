@@ -12,20 +12,21 @@
 	<script src="/static/js/user.js"> </script>
 	<link href="/static/css/app.css" rel="stylesheet">
 </head>
-{{template "header" .}}
-<body class="home">
-	<div>
-		<h2>Welcome {{ .user.Name }}</h2>
-		<p>ID: {{ .user.ID}}</p>
-		<p>Your leagues:</p>
-		{{range $val := .user.Leagues}}
-			{{if $val.Name}}
-			<a href="/league/{{$val.ID}}">{{$val.Name}}</a>
-			{{else}}
-			<p>No leagues yet!</p>
-			{{end}}
+{{if .withLeague}}
+	{{template "league" .}}
+{{end}}
+<div class="spacer"></div>
+<div>
+	<h2>Welcome {{ .user.Name }}</h2>
+	<p>ID: {{ .user.ID}}</p>
+	<p>Your leagues:</p>
+	{{range $val := .user.Leagues}}
+		{{if $val.Name}}
+		<a href="/league/{{$val.ID}}">{{$val.Name}}</a>
+		{{else}}
+		<p>No leagues yet!</p>
 		{{end}}
-	</div>
-</body>
+	{{end}}
+</div>
 </html>
 {{end}}

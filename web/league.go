@@ -7,6 +7,7 @@ import (
 	"html/template"
 	"io"
 	"net/http"
+	"net/url"
 	"os"
 	"path/filepath"
 	"sort"
@@ -35,7 +36,12 @@ func (web *Web) League(auth *authenticator.Authenticator) http.HandlerFunc {
 		prof["path"] = "league"
 
 		// get user info and picks
-		uid := prof["sub"].(string)
+		uid, _ := url.PathUnescape(r.URL.Query().Get("uid"))
+		prof["withUser"] = true
+		if uid == "" {
+			uid = prof["sub"].(string)
+			prof["withUser"] = false
+		}
 		user, err := web.getUser(r.Context(), uid)
 		if err != nil {
 			web.lg.Error("user request error", "error", err.Error())
