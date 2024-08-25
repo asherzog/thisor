@@ -1,16 +1,14 @@
 package web
 
 import (
-	"encoding/json"
-	"fmt"
 	"html/template"
-	"io"
 	"net/http"
+	"net/url"
 	"os"
 	"path/filepath"
 
 	"github.com/asherzog/thisor/internal/authenticator"
-	"github.com/asherzog/thisor/internal/db"
+	"github.com/go-chi/chi"
 )
 
 func (web *Web) User(auth *authenticator.Authenticator) http.HandlerFunc {
@@ -30,30 +28,13 @@ func (web *Web) User(auth *authenticator.Authenticator) http.HandlerFunc {
 		// So we know which page we are on in templates
 		prof["path"] = "user"
 
-		url := fmt.Sprintf("http://localhost:8080/api/users/%s", prof["sub"])
-
-		req, err := http.NewRequestWithContext(r.Context(), "GET", url, nil)
-		if err != nil {
-			web.lg.Error("user request err")
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+		uid, _ := url.PathUnescape(chi.URLParam(r, "id"))
+		if uid == "" {
+			uid = prof["sub"].(string)
 		}
-		req.SetBasicAuth(os.Getenv("BASIC_USER"), os.Getenv("BASIC_PASS"))
-		req.Header.Add("Content-Type", "application/json")
-		req.Close = true
-		resp, err := web.client.Do(req)
+		user, err := web.getUser(r.Context(), uid)
 		if err != nil {
-			web.lg.Warn("unkown user")
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
-
-		defer resp.Body.Close()
-		body, err := io.ReadAll(resp.Body)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
-
-		var user db.User
-		if err := json.Unmarshal(body, &user); err != nil {
+			web.lg.Error("user request error", "error", err.Error())
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 

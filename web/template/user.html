@@ -15,7 +15,7 @@
 {{template "header" .}}
 <body class="home">
 	<div>
-		<h2>Welcome {{ .nickname }}</h2>
+		<h2>Welcome {{ .user.Name }}</h2>
 		<p>ID: {{ .user.ID}}</p>
 		<p>Your leagues:</p>
 		{{range $val := .user.Leagues}}

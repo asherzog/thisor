@@ -22,5 +22,19 @@
             {{end}}
         </ul>
     </nav>
+    {{if eq .path "league"}}
+    <div class="spacer"></div>
+    <table>
+        <caption>{{.league.Name}}</caption>
+        <tr>
+            <td rowspan="4">Users:</td>
+            {{range $u := .league.Users}}
+            <tr>
+                <td><a href="/user/{{$u.ID}}">{{$u.Name}}</a></td>
+            </tr>
+            {{end}}
+        </tr>
+    </table>
+    {{end}}
 </html>
 {{end}}
