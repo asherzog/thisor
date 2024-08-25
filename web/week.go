@@ -16,7 +16,7 @@ import (
 	"github.com/go-chi/chi"
 )
 
-func (web Web) Week(auth *authenticator.Authenticator) http.HandlerFunc {
+func (web *Web) Week(auth *authenticator.Authenticator) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		session, err := auth.Store.Get(r, "jwt")
 		if err != nil {
@@ -83,10 +83,18 @@ func (web Web) Week(auth *authenticator.Authenticator) http.HandlerFunc {
 		lid := r.URL.Query().Get("lid")
 		prof["lid"] = lid
 
+		if len(web.weeks) == 0 {
+			for i := 1; i < 19; i++ {
+				web.weeks = append(web.weeks, i)
+			}
+		}
+		prof["weeks"] = web.weeks
+
 		workDir, _ := os.Getwd()
 		base := filepath.Join(workDir, "/web/template/header.html")
+		league := filepath.Join(workDir, "/web/template/league.html")
 		u := filepath.Join(workDir, "/web/template/picks.html")
-		tmpl, err := template.ParseFiles(u, base)
+		tmpl, err := template.ParseFiles(u, league, base)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return

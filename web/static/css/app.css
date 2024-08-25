@@ -33,10 +33,6 @@ img {
   width: 3em;
   margin-bottom: .15em;
 }
-.home-description {
-  font-weight: 100;
-  margin: 100px 0;
-}
 label {
   font-size: 100%;
   font-weight: 300;
@@ -46,7 +42,7 @@ label {
 }
 
 .login-page .login-box {
-  padding: 100px 0;
+  padding: 5% 0;
 }
 
 .container {
@@ -87,6 +83,14 @@ label {
   .card{
     width: 100%;
   }
+  .spacer {
+    margin-top: 20% !important;
+  }
+  nav ul {
+    justify-content: flex-start !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+  } 
 }
 
 .screen:hover {
@@ -121,14 +125,14 @@ p {
   color: #535151;
 }
 
-nav {
-  position: fixed;
-  top: 60px;
+#weeks {
+  position:absolute !important;
+  top: 10%;
   width: 100%;
   background-color: #f8f8f8;
   border-bottom: 1px solid #ddd;
   padding: 10px 0;
-  z-index: 1000;
+  /* z-index: 1000; */
 }
 
 nav ul {
@@ -152,4 +156,8 @@ nav ul li a {
 
 nav ul li a:hover {
   text-decoration: underline;
+}
+
+.spacer {
+  margin-top: 10% !important;
 }

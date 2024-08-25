@@ -13,18 +13,15 @@
 </head>
 {{template "header" .}}
 <body class="home">
-	<div class="container">
-		<div class="login-page clearfix">
-			<div class="login-box auth0-box before">
-				<img src="https://i.cloudup.com/StzWWrY34s.png" />
-				<h3>Thisor</h3>
-				{{if .name}}
-				<p>Start making picks</p>
-				{{else}}
-				<p>Log in to make your picks</p>
-				{{end}}
-			</div>
-		</div>
+	<div>
+		<img src="https://i.cloudup.com/StzWWrY34s.png" />
+		<h3>Thisor</h3>
+		{{if .name}}
+		<p>Start making picks</p>
+		{{else}}
+		<p>Log in to make your picks</p>
+		{{end}}
+	</div>
 	</div>
 </body>
 </html>

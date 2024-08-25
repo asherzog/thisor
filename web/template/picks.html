@@ -10,8 +10,8 @@
     <link href="/static/css/app.css" rel="stylesheet">
     <script src="/static/js/user.js"> </script>
 </head>
-{{template "header" .}}
-<a id="backtoleague" href="/league/{{ .lid }}">back</a>
+{{template "league" .}}
+<div class="spacer"></div>
 <body class="home">
     <div class="container picks">
         {{range $val := .schedule.Games}}

@@ -13,7 +13,7 @@ import (
 	"github.com/asherzog/thisor/internal/db"
 )
 
-func (web Web) User(auth *authenticator.Authenticator) http.HandlerFunc {
+func (web *Web) User(auth *authenticator.Authenticator) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		session, err := auth.Store.Get(r, "jwt")
 		if err != nil {
@@ -73,7 +73,7 @@ func (web Web) User(auth *authenticator.Authenticator) http.HandlerFunc {
 	}
 }
 
-func (web Web) UserCreate(auth *authenticator.Authenticator) http.HandlerFunc {
+func (web *Web) UserCreate(auth *authenticator.Authenticator) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		session, err := auth.Store.Get(r, "jwt")
 		if err != nil {

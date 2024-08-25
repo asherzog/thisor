@@ -14,11 +14,11 @@
         <link href="/static/css/app.css" rel="stylesheet">
     </head>
     {{template "header" .}}
-    <nav>
+    <nav id="weeks">
         <ul>
             weeks:
             {{range $i := .weeks}}
-            <li><a href="/week/{{$i}}?lid={{$.league.ID}}">{{$i}}</a></li>
+            <li><a href="/week/{{$i}}?lid={{$.lid}}">{{$i}}</a></li>
             {{end}}
         </ul>
     </nav>

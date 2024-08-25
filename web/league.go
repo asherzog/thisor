@@ -17,7 +17,7 @@ import (
 	"github.com/go-chi/chi"
 )
 
-func (web Web) League(auth *authenticator.Authenticator) http.HandlerFunc {
+func (web *Web) League(auth *authenticator.Authenticator) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		session, err := auth.Store.Get(r, "jwt")
 		if err != nil {
@@ -61,6 +61,8 @@ func (web Web) League(auth *authenticator.Authenticator) http.HandlerFunc {
 		}
 		sort.Ints(weeks)
 		prof["weeks"] = weeks
+		prof["lid"] = league.ID
+		web.weeks = weeks
 
 		workDir, _ := os.Getwd()
 		base := filepath.Join(workDir, "/web/template/header.html")
@@ -76,7 +78,7 @@ func (web Web) League(auth *authenticator.Authenticator) http.HandlerFunc {
 	}
 }
 
-func (web Web) AddUserToLeague(auth *authenticator.Authenticator) http.HandlerFunc {
+func (web *Web) AddUserToLeague(auth *authenticator.Authenticator) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		session, err := auth.Store.Get(r, "jwt")
 		if err != nil {

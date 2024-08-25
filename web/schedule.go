@@ -12,7 +12,7 @@ import (
 	"github.com/asherzog/thisor/internal/espn"
 )
 
-func (web Web) Schedule(auth *authenticator.Authenticator) http.HandlerFunc {
+func (web *Web) Schedule(auth *authenticator.Authenticator) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		session, err := auth.Store.Get(r, "jwt")
 		if err != nil {

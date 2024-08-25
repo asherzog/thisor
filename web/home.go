@@ -17,6 +17,7 @@ type Web struct {
 	client     *http.Client
 	lg         *slog.Logger
 	isLoggedIn bool
+	weeks      []int
 }
 
 func NewClient(lg *slog.Logger) *Web {
@@ -26,7 +27,7 @@ func NewClient(lg *slog.Logger) *Web {
 	return &Web{lg: lg, client: &client}
 }
 
-func (web Web) Serve(auth *authenticator.Authenticator) http.HandlerFunc {
+func (web *Web) Serve(auth *authenticator.Authenticator) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		session, err := auth.Store.Get(r, "jwt")
 		if err != nil {

@@ -13,7 +13,7 @@
         .top-bar {
             background-color: #333;
             color: white;
-            padding: 10px 5%;
+            padding: 1% 1%;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -23,32 +23,9 @@
         }
         .header {
             background-color: #f8f8f8;
-            padding: 20px 5%;
+            padding: 1% 1%;
             text-align: center;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        .nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background-color: #444;
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            box-shadow: 0 -2px 4px rgba(0,0,0,0.1);
-            z-index: 10;
-        }
-        .nav a {
-            color: white;
-            padding: 14px 20px;
-            text-decoration: none;
-            text-align: center;
-            flex-grow: 1;
-        }
-        .nav a:hover {
-            background-color: #ddd;
-            color: black;
         }
         .user-profile {
             position: relative;
@@ -58,12 +35,12 @@
         }
         .user-profile img {
             border-radius: 50%;
-            width: 40px;
-            height: 40px;
+            width: 20%;
+            height: 20%;
             margin-right: 10px;
         }
         .user-profile span {
-            font-size: 16px;
+            font-size: 40%;
         }
         .dropdown-menu {
             display: none;
@@ -73,7 +50,7 @@
             background-color: white;
             box-shadow: 0 8px 16px rgba(0,0,0,0.2);
             min-width: 160px;
-            z-index: 1;
+            z-index: 10000;
         }
         .dropdown-menu a {
             color: black;
@@ -97,9 +74,6 @@
                 width: 30px;
                 height: 30px;
             }
-            .nav a {
-                padding: 10px 15px;
-            }
             .dropdown-menu {
                 right: -20px; /* Adjust positioning for smaller screens */
                 min-width: 140px;
@@ -114,11 +88,6 @@
             .header {
                 padding: 15px;
             }
-            .nav a {
-                padding: 10px 0;
-                flex-grow: unset; /* Disable flex-grow for more control over the layout */
-                width: 100%;
-            }
         }
     </style>
 </head>
@@ -130,10 +99,10 @@
             <img src="{{.picture}}" alt="User Profile">
             <span>{{.name}}</span>
             <div class="dropdown-menu">
-                {{if eq .path "home"}}
-                <a href="/user">user</a>
-                {{else}}
+                {{if eq .path "user"}}
                 <a href="/home">home</a>
+                {{else}}
+                <a href="/user">user</a>
                 {{end}}
                 <a href="/logout">Sign Out</a>  
             </div>
