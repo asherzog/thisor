@@ -1,13 +1,18 @@
 package web
 
 import (
+	"context"
+	"encoding/json"
+	"fmt"
 	"html/template"
+	"io"
 	"net/http"
 	"net/url"
 	"os"
 	"path/filepath"
 
 	"github.com/asherzog/thisor/internal/authenticator"
+	"github.com/asherzog/thisor/internal/db"
 	"github.com/go-chi/chi"
 )
 
@@ -35,7 +40,7 @@ func (web *Web) User(auth *authenticator.Authenticator) http.HandlerFunc {
 			prof["withUser"] = false
 		}
 		prof["uid"] = uid
-		user, err := web.getUser(r.Context(), uid)
+		user, err := web.getUser(r.Context(), uid, prof["sub"].(string))
 		if err != nil {
 			web.lg.Error("user request error", "error", err.Error())
 			http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -100,4 +105,32 @@ func (web *Web) UserCreate(auth *authenticator.Authenticator) http.HandlerFunc {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 	}
+}
+
+func (web Web) getUser(ctx context.Context, id, sub string) (db.User, error) {
+	var user db.User
+	url := fmt.Sprintf("http://localhost:8080/api/users/%s", id)
+	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
+	if err != nil {
+		return user, err
+	}
+	req.SetBasicAuth(os.Getenv("BASIC_USER"), os.Getenv("BASIC_PASS"))
+	req.Header.Add("Content-Type", "application/json")
+	req.Header.Add("sub", sub)
+	req.Close = true
+	resp, err := web.client.Do(req)
+	if err != nil {
+		return user, err
+	}
+
+	defer resp.Body.Close()
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return user, err
+	}
+
+	if err := json.Unmarshal(body, &user); err != nil {
+		return user, err
+	}
+	return user, nil
 }

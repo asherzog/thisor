@@ -35,10 +35,14 @@ func (web *Web) Week(auth *authenticator.Authenticator) http.HandlerFunc {
 
 		// get user info and picks
 		uid, _ := url.PathUnescape(r.URL.Query().Get("uid"))
+		prof["withUser"] = true
 		if uid == "" {
 			uid = prof["sub"].(string)
+			prof["withUser"] = false
 		}
-		user, err := web.getUser(r.Context(), uid)
+		prof["uid"] = uid
+
+		user, err := web.getUser(r.Context(), uid, prof["sub"].(string))
 		if err != nil {
 			web.lg.Error("user request error", "error", err.Error())
 			http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -66,6 +70,7 @@ func (web *Web) Week(auth *authenticator.Authenticator) http.HandlerFunc {
 		for _, g := range week.Games {
 			for _, p := range user.Picks {
 				if g.ID == p.GameID {
+					prof["isLocked"] = p.IsLocked
 					w, _ := prof["w"].(map[string]string)
 					w[p.GameID] = p.Selection.ID
 					prof["w"] = w
@@ -93,6 +98,12 @@ func (web *Web) Week(auth *authenticator.Authenticator) http.HandlerFunc {
 			}
 		}
 		prof["weeks"] = web.weeks
+
+		prof["canSubmit"] = false
+		loggedIn := prof["sub"].(string)
+		if loggedIn == uid {
+			prof["canSubmit"] = true
+		}
 
 		workDir, _ := os.Getwd()
 		base := filepath.Join(workDir, "/web/template/header.html")

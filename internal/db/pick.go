@@ -3,6 +3,9 @@ package db
 import (
 	"context"
 	"errors"
+	"fmt"
+	"strings"
+	"time"
 
 	"cloud.google.com/go/firestore"
 	"github.com/asherzog/thisor/internal/espn"
@@ -120,7 +123,7 @@ func (d *DB) GetAllPicks(ctx context.Context) (*PickList, error) {
 	return &picks, nil
 }
 
-func (d *DB) GetPicksForUser(ctx context.Context, id string) (*PickList, error) {
+func (d *DB) GetPicksForUser(ctx context.Context, id, sub string) (*PickList, error) {
 	pickList := PickList{Users: map[string][]Pick{}}
 	iter := d.pickCollection().Where("UserID", "==", id).Documents(ctx)
 	for {
@@ -137,6 +140,33 @@ func (d *DB) GetPicksForUser(ctx context.Context, id string) (*PickList, error) 
 			d.lg.Error("unable to parse pick", "error", err.Error())
 			return nil, err
 		}
+
+		// user viewing other user
+		if id != sub {
+			pick.IsLocked = true
+			game, err := d.GetGame(ctx, pick.GameID)
+			if err != nil {
+				d.lg.Error("unable to get game", "error", err.Error())
+				return nil, err
+			}
+
+			ts := strings.Split(game.Date, "Z")[0]
+			ts = fmt.Sprintf("%s:00Z", ts)
+
+			date, err := time.Parse(time.RFC3339, ts)
+			if err != nil {
+				d.lg.Error("unable to get game time", "error", err.Error())
+				return nil, err
+			}
+			now := time.Now()
+			// Game not started, Don't show details
+			if now.Before(date) {
+				pick.Selection = espn.Team{}
+				pick.WinScore = 0
+				pick.LoseScore = 0
+			}
+		}
+
 		pickList.Users[id] = append(pickList.Users[id], pick)
 	}
 	return &pickList, nil

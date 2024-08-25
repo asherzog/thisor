@@ -15,11 +15,14 @@
 <a id="backtoleague" href="/league/{{ .lid }}">back</a>
 <body class="home">
     <div class="container picks">
+        {{if $.isLocked}}
+        <div id="overlay">Locked until games start</div>
+        {{end}}
         {{range $val := .schedule.Games}}
         {{$pick := index $.w $val.ID }}
         {{$ws := index $.winScore $val.ID }}
         {{$ls := index $.loseScore $val.ID }}
-            <div class="card">
+            <div {{if $.isLocked}}id="locked"{{end}} class="card">
                 <div class="row g-0 parentDiv">
                     <div id="pick-{{$val.Home.ID}}" data-user="{{$.sub}}" data-game="{{$val.ID}}" data-value="{{$val.Home.ID}}" data-week="{{$val.Week}}" {{if eq $pick $val.Home.ID}}class="col-sm-6 hometeam screen childDiv pick selection" {{else}} class="col-sm-6 hometeam screen childDiv"{{end}}>
                         <img src="{{$val.Home.Logo}}" />
@@ -45,7 +48,9 @@
             </div>
         {{end}}
     </div>
+    {{if .canSubmit}}
     <button id="submit" class="btn">submit</button>
+    {{end}}
 </body>
 </html>
 {{end}}

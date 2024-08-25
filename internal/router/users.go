@@ -33,7 +33,8 @@ func (router Router) GetAllUsers() http.HandlerFunc {
 
 func (router Router) GetUser() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		res, err := router.db.GetUser(r.Context(), chi.URLParam(r, "id"))
+		sub := r.Header.Get("sub")
+		res, err := router.db.GetUser(r.Context(), chi.URLParam(r, "id"), sub)
 		if err != nil {
 			router.logger.Error("db error", "err", err.Error())
 			w.WriteHeader(http.StatusBadRequest)

@@ -51,7 +51,7 @@ func (d *DB) GetAllLeagues(ctx context.Context) (*LeagueList, error) {
 
 func (d *DB) CreateLeague(ctx context.Context, l League) (*League, error) {
 	// TODO: pull admin from authenticated user
-	admin, err := d.GetUser(ctx, l.Admin)
+	admin, err := d.GetUser(ctx, l.Admin, "")
 	if err != nil {
 		return nil, errors.New("invalid admin user")
 	}
@@ -102,7 +102,7 @@ func (d *DB) GetLeague(ctx context.Context, id string) (*League, error) {
 }
 
 func (d *DB) AddUserToLeague(ctx context.Context, leagueId, userId string) (*[]User, error) {
-	user, err := d.GetUser(ctx, userId)
+	user, err := d.GetUser(ctx, userId, "")
 	if err != nil {
 		return nil, errors.New("invalid user provided")
 	}
@@ -148,7 +148,7 @@ func (d *DB) AddUserToLeague(ctx context.Context, leagueId, userId string) (*[]U
 }
 
 func (d *DB) DeleteUserFromLeague(ctx context.Context, leagueId, userId string) (*[]User, error) {
-	user, err := d.GetUser(ctx, userId)
+	user, err := d.GetUser(ctx, userId, "")
 	if err != nil {
 		return nil, errors.New("invalid user provided")
 	}

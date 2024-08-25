@@ -54,7 +54,7 @@ func (d *DB) CreateUser(ctx context.Context, user User) (*User, error) {
 	return &user, nil
 }
 
-func (d *DB) GetUser(ctx context.Context, id string) (*User, error) {
+func (d *DB) GetUser(ctx context.Context, id, sub string) (*User, error) {
 	doc, err := d.userCollection().Doc(id).Get(ctx)
 	if err != nil {
 		d.lg.Error("unable to fetch user", "error", err.Error())
@@ -66,7 +66,7 @@ func (d *DB) GetUser(ctx context.Context, id string) (*User, error) {
 		d.lg.Error("unable to parse user", "error", err.Error())
 		return nil, err
 	}
-	picks, err := d.GetPicksForUser(ctx, id)
+	picks, err := d.GetPicksForUser(ctx, id, sub)
 	if err != nil {
 		d.lg.Error("unable to get picks for user", "error", err.Error())
 		return nil, err

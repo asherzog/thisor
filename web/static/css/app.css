@@ -167,6 +167,20 @@ th, td {
   /* border: 1px solid #ddd; */
 }
 
+#overlay {
+  height: 100%;
+  width: 100%;
+  z-index: 10000;
+  background-color: rgba(145, 144, 144, 0.5);
+  font-size: 50px;
+  text-align: center;
+  line-height: 100px;
+  box-shadow: 0 3px 5px rgba(0, 0, 0, 0.3);
+}
+#locked {
+  filter: blur(5px);
+}
+
 @media (max-width: 770px) {
   .card{
     width: 100%;

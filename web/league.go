@@ -42,18 +42,17 @@ func (web *Web) League(auth *authenticator.Authenticator) http.HandlerFunc {
 			uid = prof["sub"].(string)
 			prof["withUser"] = false
 		}
-		user, err := web.getUser(r.Context(), uid)
+		user, err := web.getUser(r.Context(), uid, prof["sub"].(string))
 		if err != nil {
 			web.lg.Error("user request error", "error", err.Error())
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 		prof["user"] = user
 
-		league := db.League{}
-		for _, l := range user.Leagues {
-			if l.ID == chi.URLParam(r, "id") {
-				league = l
-			}
+		league, err := web.getLeague(r.Context(), chi.URLParam(r, "id"))
+		if err != nil {
+			web.lg.Error("league request error", "error", err.Error())
+			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 		prof["league"] = league
 
@@ -114,29 +113,29 @@ func (web *Web) AddUserToLeague(auth *authenticator.Authenticator) http.HandlerF
 	}
 }
 
-func (web Web) getUser(ctx context.Context, id string) (db.User, error) {
-	var user db.User
-	url := fmt.Sprintf("http://localhost:8080/api/users/%s", id)
+func (web Web) getLeague(ctx context.Context, id string) (db.League, error) {
+	var league db.League
+	url := fmt.Sprintf("http://localhost:8080/api/leagues/%s", id)
 	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
 	if err != nil {
-		return user, err
+		return league, err
 	}
 	req.SetBasicAuth(os.Getenv("BASIC_USER"), os.Getenv("BASIC_PASS"))
 	req.Header.Add("Content-Type", "application/json")
 	req.Close = true
 	resp, err := web.client.Do(req)
 	if err != nil {
-		return user, err
+		return league, err
 	}
 
 	defer resp.Body.Close()
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return user, err
+		return league, err
 	}
 
-	if err := json.Unmarshal(body, &user); err != nil {
-		return user, err
+	if err := json.Unmarshal(body, &league); err != nil {
+		return league, err
 	}
-	return user, nil
+	return league, nil
 }
