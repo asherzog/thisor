@@ -38,12 +38,13 @@ $(document).ready(function() {
       };
     }).get();
     var win = $("#win").val();
-    var lose = $("#win").val();
+    var lose = $("#lose").val();
     var len = data.length
     if (len > 0) {
       data[len-1]["win_score"] = parseInt(win)
       data[len-1]["lose_score"] = parseInt(lose)
     }
+    var redirect = $('#backtoleague').attr('href');
     $.ajax({
       type: "POST",
       url: "/api/picks/list",
@@ -51,7 +52,7 @@ $(document).ready(function() {
       contentType: "application/json; charset=utf-8",
       dataType: "json",
       success:function(){
-        window.location.href = "/user"
+        window.location.href = redirect
       }
     });
   });

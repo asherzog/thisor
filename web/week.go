@@ -1,6 +1,7 @@
 package web
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"html/template"
@@ -22,41 +23,30 @@ func (web Web) Week(auth *authenticator.Authenticator) http.HandlerFunc {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		prof := session.Values["prof"]
-		user, ok := prof.(authenticator.Profile)
+		val := session.Values["prof"]
+		prof, ok := val.(authenticator.Profile)
 		if !ok {
 			web.lg.Warn("user not logged in")
 			http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 			return
 		}
-		user["path"] = "week"
+		prof["path"] = "week"
 
-		url := fmt.Sprintf("http://localhost:8080/api/schedule/week/%s", chi.URLParam(r, "id"))
-
-		req, err := http.NewRequestWithContext(r.Context(), "GET", url, nil)
+		// get user info and picks
+		uid := prof["sub"].(string)
+		user, err := web.getUser(r.Context(), uid)
 		if err != nil {
-			web.lg.Error("user request err")
+			web.lg.Error("user request error", "error", err.Error())
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
-		req.SetBasicAuth(os.Getenv("BASIC_USER"), os.Getenv("BASIC_PASS"))
-		req.Header.Add("Content-Type", "application/json")
-		req.Close = true
-		resp, err := web.client.Do(req)
+		prof["user"] = user
+
+		week, err := web.getWeek(r.Context(), chi.URLParam(r, "id"))
 		if err != nil {
-			web.lg.Error("user request err")
+			web.lg.Error("week request error", "error", err.Error())
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 
-		defer resp.Body.Close()
-		body, err := io.ReadAll(resp.Body)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
-
-		var week espn.Schedule
-		if err := json.Unmarshal(body, &week); err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
 		l := len(week.Games)
 		if l == 0 {
 			web.lg.Error("no games")
@@ -65,11 +55,33 @@ func (web Web) Week(auth *authenticator.Authenticator) http.HandlerFunc {
 		sort.Slice(week.Games, func(i, j int) bool {
 			return week.Games[i].Date < week.Games[j].Date
 		})
+
+		prof["w"] = map[string]string{}
+		prof["winScore"] = map[string]int{}
+		prof["loseScore"] = map[string]int{}
+		for _, g := range week.Games {
+			for _, p := range user.Picks {
+				if g.ID == p.GameID {
+					w, _ := prof["w"].(map[string]string)
+					w[p.GameID] = p.Selection.ID
+					prof["w"] = w
+					if p.WinScore > 0 {
+						ws, _ := prof["winScore"].(map[string]int)
+						ls, _ := prof["loseScore"].(map[string]int)
+						ws[p.GameID] = p.WinScore
+						ls[p.GameID] = p.LoseScore
+						prof["winScore"] = ws
+						prof["loseScore"] = ls
+					}
+				}
+			}
+		}
+
 		last := week.Games[len(week.Games)-1].ID
-		user["last"] = last
-		user["schedule"] = week
+		prof["last"] = last
+		prof["schedule"] = week
 		lid := r.URL.Query().Get("lid")
-		user["lid"] = lid
+		prof["lid"] = lid
 
 		workDir, _ := os.Getwd()
 		base := filepath.Join(workDir, "/web/template/header.html")
@@ -79,8 +91,36 @@ func (web Web) Week(auth *authenticator.Authenticator) http.HandlerFunc {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		if err := tmpl.ExecuteTemplate(w, "schedule", user); err != nil {
+		if err := tmpl.ExecuteTemplate(w, "schedule", prof); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 	}
+}
+
+func (web Web) getWeek(ctx context.Context, id string) (espn.Schedule, error) {
+	var week espn.Schedule
+	url := fmt.Sprintf("http://localhost:8080/api/schedule/week/%s", id)
+
+	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
+	if err != nil {
+		return week, err
+	}
+	req.SetBasicAuth(os.Getenv("BASIC_USER"), os.Getenv("BASIC_PASS"))
+	req.Header.Add("Content-Type", "application/json")
+	req.Close = true
+	resp, err := web.client.Do(req)
+	if err != nil {
+		return week, err
+	}
+
+	defer resp.Body.Close()
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return week, err
+	}
+
+	if err := json.Unmarshal(body, &week); err != nil {
+		return week, err
+	}
+	return week, nil
 }

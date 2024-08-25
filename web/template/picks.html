@@ -11,17 +11,20 @@
     <script src="/static/js/user.js"> </script>
 </head>
 {{template "header" .}}
-<a href="/league/{{ .lid }}">back</a>
+<a id="backtoleague" href="/league/{{ .lid }}">back</a>
 <body class="home">
     <div class="container picks">
         {{range $val := .schedule.Games}}
+        {{$pick := index $.w $val.ID }}
+        {{$ws := index $.winScore $val.ID }}
+        {{$ls := index $.loseScore $val.ID }}
             <div class="card">
                 <div class="row g-0 parentDiv">
-                    <div id="pick-{{$val.Home.ID}}" data-user="{{$.sub}}" data-game="{{$val.ID}}" data-value="{{$val.Home.ID}}" data-week="{{$val.Week}}" class="col-sm-6 hometeam screen childDiv">
+                    <div id="pick-{{$val.Home.ID}}" data-user="{{$.sub}}" data-game="{{$val.ID}}" data-value="{{$val.Home.ID}}" data-week="{{$val.Week}}" {{if eq $pick $val.Home.ID}}class="col-sm-6 hometeam screen childDiv pick selection" {{else}} class="col-sm-6 hometeam screen childDiv"{{end}}>
                         <img src="{{$val.Home.Logo}}" />
                         <p>Home</p>
                     </div>
-                    <div  id="pick-{{$val.Away.ID}}" data-user="{{$.sub}}" data-game="{{$val.ID}}" data-value="{{$val.Away.ID}}" data-week="{{$val.Week}}" class="col-sm-6 awayteam screen childDiv">
+                    <div  id="pick-{{$val.Away.ID}}" data-user="{{$.sub}}" data-game="{{$val.ID}}" data-value="{{$val.Away.ID}}" data-week="{{$val.Week}}" {{if eq $pick $val.Away.ID}}class="col-sm-6 awayteam screen childDiv selection" {{else}} class="col-sm-6 awayteam screen childDiv"{{end}}>
                         <img src="{{$val.Away.Logo}}" />
                         <p>Away</p>
                     </div>
@@ -33,10 +36,10 @@
                 </div>
                 {{if eq $val.ID $.last}}
                 <label for="win">win score:</label>
-                <input type="text" id="win" name="win" required>
+                <input type="text" id="win" name="win" value="{{$ws}}" required>
 
                 <label for="lose">lose score:</label>
-                <input type="text" id="lose" name="lose" required>
+                <input type="text" id="lose" name="lose" value="{{$ls}}" required>
                 {{end}}
             </div>
         {{end}}

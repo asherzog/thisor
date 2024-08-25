@@ -1,6 +1,7 @@
 package web
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"html/template"
@@ -33,32 +34,14 @@ func (web Web) League(auth *authenticator.Authenticator) http.HandlerFunc {
 		// So we know which page we are on in templates
 		prof["path"] = "league"
 
-		url := fmt.Sprintf("http://localhost:8080/api/users/%s", prof["sub"])
-
-		req, err := http.NewRequestWithContext(r.Context(), "GET", url, nil)
+		// get user info and picks
+		uid := prof["sub"].(string)
+		user, err := web.getUser(r.Context(), uid)
 		if err != nil {
-			web.lg.Error("user request err")
+			web.lg.Error("user request error", "error", err.Error())
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
-		req.SetBasicAuth(os.Getenv("BASIC_USER"), os.Getenv("BASIC_PASS"))
-		req.Header.Add("Content-Type", "application/json")
-		req.Close = true
-		resp, err := web.client.Do(req)
-		if err != nil {
-			web.lg.Error("user request err")
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
-
-		defer resp.Body.Close()
-		body, err := io.ReadAll(resp.Body)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
-
-		var user db.User
-		if err := json.Unmarshal(body, &user); err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
+		prof["user"] = user
 
 		league := db.League{}
 		for _, l := range user.Leagues {
@@ -121,4 +104,31 @@ func (web Web) AddUserToLeague(auth *authenticator.Authenticator) http.HandlerFu
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 	}
+}
+
+func (web Web) getUser(ctx context.Context, id string) (db.User, error) {
+	var user db.User
+	url := fmt.Sprintf("http://localhost:8080/api/users/%s", id)
+	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
+	if err != nil {
+		return user, err
+	}
+	req.SetBasicAuth(os.Getenv("BASIC_USER"), os.Getenv("BASIC_PASS"))
+	req.Header.Add("Content-Type", "application/json")
+	req.Close = true
+	resp, err := web.client.Do(req)
+	if err != nil {
+		return user, err
+	}
+
+	defer resp.Body.Close()
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return user, err
+	}
+
+	if err := json.Unmarshal(body, &user); err != nil {
+		return user, err
+	}
+	return user, nil
 }
