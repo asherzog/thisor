@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Create New User</title>
-    <script src="http://code.jquery.com/jquery-3.1.0.min.js" type="text/javascript"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js" type="text/javascript"></script>
     <script src="/static/js/user.js"> </script>
     <style>
         body {
@@ -55,22 +55,18 @@
         }
     </style>
 </head>
-{{template "header" .}}
-<body>
-
 <div class="form-container">
-    <h2>Create New User</h2>
+    <h2>Register New User</h2>
+    <p>You must register your user to be able to join a league</p>
     <form class="userCreateForm" method="POST" enctype="application/x-www-form-urlencoded">
         <label for="name">Name:</label>
-        <input type="text" id="name" name="name" required>
+        <input type="text" id="name" name="name" value="{{.name}}" required>
 
         <label for="id">ID:</label>
-        <input type="text" id="id" name="id" required>
+        <input type="text" id="id" name="id" value="{{.sub}}" readonly="true">
 
-        <input type="submit" value="Create User">
+        <input type="submit" value="Register User">
     </form>
 </div>
-
-</body>
 </html>
 {{end}}

@@ -3,6 +3,7 @@ package web
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"html/template"
 	"io"
@@ -43,7 +44,8 @@ func (web *Web) User(auth *authenticator.Authenticator) http.HandlerFunc {
 		user, err := web.getUser(r.Context(), uid, prof["sub"].(string))
 		if err != nil {
 			web.lg.Error("user request error", "error", err.Error())
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			http.Redirect(w, r, "/create-user", http.StatusTemporaryRedirect)
+			return
 		}
 
 		prof["user"] = user
@@ -54,7 +56,11 @@ func (web *Web) User(auth *authenticator.Authenticator) http.HandlerFunc {
 			}
 		}
 		prof["weeks"] = web.weeks
-
+		prof["leagues"] = user.Leagues
+		prof["hasLeagues"] = true
+		if len(user.Leagues) == 0 {
+			prof["hasLeagues"] = false
+		}
 		prof["withLeague"] = false
 		lid := r.URL.Query().Get("lid")
 		if lid != "" {
@@ -121,6 +127,9 @@ func (web Web) getUser(ctx context.Context, id, sub string) (db.User, error) {
 	resp, err := web.client.Do(req)
 	if err != nil {
 		return user, err
+	}
+	if resp.StatusCode == http.StatusBadRequest {
+		return user, errors.New("invalid user")
 	}
 
 	defer resp.Body.Close()

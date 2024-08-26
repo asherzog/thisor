@@ -125,7 +125,7 @@ func (router Router) Logout(auth *authenticator.Authenticator) http.HandlerFunc 
 		}
 
 		scheme := "http"
-		if r.TLS != nil {
+		if os.Getenv("IS_LOCAL") != "true" {
 			scheme = "https"
 		}
 

@@ -6,9 +6,11 @@ services:
   #     dockerfile: ./docker/server/dockerfile
   #   working_dir: /cmd
   #   ports:
-  #     - "127.0.0.1:8080:$PORT"
+  #     - "8080:8080"
   #   env_file:
   #     - .env
+  #   volumes:
+  #      - ./web:/cmd/web/:rw
   #   depends_on:
   #     - firestore
 
@@ -19,8 +21,8 @@ services:
     env_file:
       - .env
     ports:
-      - "127.0.0.1:8787:8787"
-      - "127.0.0.1:4000:4000"
+      - "8787:8787"
+      - "4000:4000"
     volumes:
        - ./docker/firebase/cache:/root/.cache/:rw
        - ./docker/firebase/data:/data:rw

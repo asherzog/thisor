@@ -17,3 +17,8 @@ docker-build:
 
 run: docker-build
 	docker-compose up
+	
+.PHONY: deploy
+
+deploy: 
+	gcloud run deploy thisor --source .

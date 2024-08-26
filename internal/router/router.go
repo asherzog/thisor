@@ -32,11 +32,13 @@ func NewRouter(lg *slog.Logger) (http.Handler, error) {
 	ctx := context.Background()
 	dbClient, err := db.NewClient(ctx, lg)
 	if err != nil {
+		lg.Error("db client error")
 		return nil, err
 	}
 
 	auth, err := authenticator.New()
 	if err != nil {
+		lg.Error("auth client error")
 		return nil, err
 	}
 

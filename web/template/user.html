@@ -2,7 +2,7 @@
 <html>
 <head>
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<script src="http://code.jquery.com/jquery-3.1.0.min.js" type="text/javascript"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js" type="text/javascript"></script>
 
 	<!-- font awesome from BootstrapCDN -->
 	<link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
@@ -19,13 +19,14 @@
 <div>
 	<h2>Welcome {{ .user.Name }}</h2>
 	<p>ID: {{ .user.ID}}</p>
+	{{if .hasLeagues}}
 	<p>Your leagues:</p>
-	{{range $val := .user.Leagues}}
-		{{if $val.Name}}
-		<a href="/league/{{$val.ID}}">{{$val.Name}}</a>
-		{{else}}
-		<p>No leagues yet!</p>
+		{{range $val := .leagues}}
+			<a href="/league/{{$val.ID}}">{{$val.Name}}</a>
 		{{end}}
+	{{else}}
+		<p>No Leagues yet!</p>
+		<a href="/join">Join a league</a>
 	{{end}}
 </div>
 </html>

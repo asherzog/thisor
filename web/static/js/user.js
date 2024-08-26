@@ -6,7 +6,10 @@ $(document).ready(function() {
         type: 'post',
         data:$('.userCreateForm').serialize(),
         success:function(){
-          window.location.href = "/home"
+          window.location.href = "/user"
+        },
+        error:function() {
+          alert("user invalid " + $('.userCreateForm').serialize());
         }
     });
   });
@@ -20,6 +23,9 @@ $(document).ready(function() {
         data:$('.joinLeagueForm').serialize(),
         success:function(){
           window.location.href = "/user"
+        },
+        error:function() {
+          alert("invalid league " + league);
         }
     });
   });
@@ -27,6 +33,8 @@ $(document).ready(function() {
     $(this).addClass('selection').siblings().removeClass('selection');
   });
   $("#submit").click(function() { 
+    $('#submit').addClass('disabled');
+    $('.loader').addClass('active');
     var user = ""
     var data = $('.selection').map(function() {
       user = $(this).data('user')

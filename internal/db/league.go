@@ -83,6 +83,17 @@ func (d *DB) CreateLeague(ctx context.Context, l League) (*League, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	admin.Leagues = append(admin.Leagues, l)
+	_, err = d.userCollection().Doc(admin.ID).Update(ctx, []firestore.Update{
+		{
+			Path:  "Leagues",
+			Value: admin.Leagues,
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
 	return &l, nil
 }
 

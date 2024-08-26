@@ -79,24 +79,14 @@
                 min-width: 140px;
             }
         }
-
-        @media (max-width: 480px) {
-            .top-bar {
-                flex-direction: column;
-                text-align: center;
-            }
-            .header {
-                padding: 15px;
-            }
-        }
     </style>
 </head>
 <body>
     <div class="top-bar">
-        <div class="point"><a href="/home">Thisor</a></div>
+        <div class="point"><a href="/home"><img class="applogo" src="/static/image/helm.svg" /></a></div>
         {{if .name}}
         <div class="user-profile">
-            <img src="{{.picture}}" alt="User Profile">
+            <img src="{{.picture}}" alt="User Profile" referrerpolicy="no-referrer">
             <span>{{.name}}</span>
             <div class="dropdown-menu">
                 {{if eq .path "user"}}

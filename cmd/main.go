@@ -11,9 +11,11 @@ import (
 )
 
 func main() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
+	if os.Getenv("IS_LOCAL") == "true" {
+		err := godotenv.Load()
+		if err != nil {
+			log.Fatal("Error loading .env file")
+		}
 	}
 	var (
 		host = flag.String("host", "", "host http address to listen on")
