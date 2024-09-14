@@ -11,7 +11,7 @@ import (
 )
 
 func main() {
-	if os.Getenv("IS_LOCAL") == "true" {
+	if os.Getenv("IS_LOCAL") != "true" {
 		err := godotenv.Load()
 		if err != nil {
 			log.Fatal("Error loading .env file")

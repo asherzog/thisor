@@ -1,26 +1,14 @@
 {{define "home"}}
 <html>
-<head>
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js" type="text/javascript"></script>
-
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-
-	<!-- font awesome from BootstrapCDN -->
-	<link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
-	<link href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
-
-	<link href="/static/css/app.css" rel="stylesheet">
-</head>
 {{template "header" .}}
 <body class="home">
-	<div>
-		<h3>Wellcome to the pool</h3>
+	<div class="container-fluid">
+		<h3>Welcome to the pool</h3>
 		{{if .name}}
 		<p>Start making <a href="/user">picks</a></p>
 		{{else}}
 		<p><a href="/login">Sign in</a> to get started</p>
 		{{end}}
-	</div>
 	</div>
 </body>
 </html>

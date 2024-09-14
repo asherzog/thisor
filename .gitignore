@@ -1,4 +1,6 @@
 /bin
+/tmp
 .env
 /docker/firebase/cache
 /docker/firebase/data
+.air.toml

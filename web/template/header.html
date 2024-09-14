@@ -1,108 +1,97 @@
 <!DOCTYPE html>
 {{define "header"}}
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thisor</title>
-    <style>
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>GamePool</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js" type="text/javascript"></script>
+        <style>
+        .navbar {
+            position: sticky;
+            top: 0;
+            z-index: 1030;
+            background-color: #f8f9fa;
         }
-        .top-bar {
-            background-color: #333;
-            color: white;
-            padding: 1% 1%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        .navbar-brand img {
+            height: 40px;
+            width: auto;
         }
-        .point {
-            cursor: pointer;
-        }
-        .header {
-            background-color: #f8f8f8;
-            padding: 1% 1%;
-            text-align: center;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        .user-profile {
-            position: relative;
-            display: flex;
-            align-items: center;
-            cursor: pointer;
-        }
-        .user-profile img {
-            border-radius: 50%;
-            width: 20%;
-            height: 20%;
-            margin-right: 10px;
-        }
-        .user-profile span {
-            font-size: 40%;
-        }
-        .dropdown-menu {
-            display: none;
-            position: absolute;
-            top: 100%;
+        .dropdown-menu-end {
             right: 0;
-            background-color: white;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
-            min-width: 160px;
-            z-index: 10000;
+            left: auto;
         }
-        .dropdown-menu a {
-            color: black;
-            padding: 12px 16px;
-            text-decoration: none;
-            display: block;
-        }
-        .dropdown-menu a:hover {
-            background-color: #f1f1f1;
-        }
-        .user-profile:hover .dropdown-menu {
-            display: block;
+        @media (max-width:767px) {
+            .navbar-collapse.collapse.in .navbar-nav .dropdown-menu {
+                display:inline-block;
+                position:static;
+                float:none;
+                width:auto;
+                margin-top:0;
+                background-color:transparent;
+                border:0;
+                -webkit-box-shadow:none;
+                box-shadow:none;
+            }
         }
 
-        /* Media Queries for Responsive Design */
-        @media (max-width: 768px) {
-            .user-profile span {
-                display: none; /* Hide the username on smaller screens */
-            }
-            .user-profile img {
-                width: 30px;
-                height: 30px;
-            }
-            .dropdown-menu {
-                right: -20px; /* Adjust positioning for smaller screens */
-                min-width: 140px;
+        @media (max-width:767px) {
+            .navbar-collapse.collapse.in .navbar-nav .dropdown-menu .dropdown-header, .navbar-collapse.collapse.in .navbar-nav .dropdown-menu > li > a {
+                padding:5px 15px 5px 25px;
+                color:#777;
             }
         }
-    </style>
-</head>
-<body>
-    <div class="top-bar">
-        <div class="point"><a href="/home"><img class="applogo" src="/static/image/helm.svg" /></a></div>
-        {{if .name}}
-        <div class="user-profile">
-            <img src="{{.picture}}" alt="User Profile" referrerpolicy="no-referrer">
-            <span>{{.name}}</span>
-            <div class="dropdown-menu">
-                {{if eq .path "user"}}
-                <a href="/home">home</a>
-                {{else}}
-                <a href="/user">user</a>
-                {{end}}
-                <a href="/logout">Sign Out</a>  
+        </style>
+    </head>
+    <body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+          <!-- Brand logo and name -->
+          <a class="navbar-brand d-flex align-items-center" href="/home">
+            <img src="/static/image/helm.svg" alt="Logo" class="me-2">
+            <span>GamePool</span>
+          </a>
+    
+          <!-- Toggler for mobile view -->
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+    
+          <!-- Right-side user avatar and dropdown -->
+            {{if .name}}
+            <div class="collapse navbar-collapse justify-content-end" id="navbarSupportedContent">
+                <ul class="navbar-nav">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <img src="{{.picture}}" alt="User Avatar" class="rounded-circle" style="width: 40px; height: 40px;">
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                            {{if eq .path "user"}}
+                            <li><a class="dropdown-item" href="/home">Home</a></li>
+                            {{else}}
+                            <li><a class="dropdown-item" href="/user">Profile</a></li>
+                            {{end}}
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="/logout">Logout</a></li>
+                        </ul>
+                    </li>
+                </ul>
             </div>
+            {{else}}
+            <div class="user-profile">
+                <a href="/login">Sign In</a> 
+            </div>
+            {{end}}
         </div>
-        {{else}}
-        <div class="user-profile">
-            <a href="/login">Sign In</a> 
-        </div>
-        {{end}}
-    </div>
-</body>
+      </nav>
+    <script>
+        var $menu = $('.dropdown-menu');
+
+        if (window.innerWidth <= 800) $menu.addClass('show');
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+    </body>
 </html>
 {{end}}

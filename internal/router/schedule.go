@@ -27,16 +27,13 @@ func (router Router) Schedule() chi.Router {
 
 func (router Router) GetSchedule() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		res, err := router.db.GetSchedule(r.Context(), "2024")
+		res, err := router.espnClient.GetSchedule()
 		if err != nil {
-			router.logger.Error("db error", "err", err.Error())
-			router.logger.Info("attempting to fetch from espn")
-			res, err = router.espnClient.GetSchedule()
-			if err != nil {
-				router.logger.Error("espn error", "err", err.Error())
-				// TODO: check for different types of errors
-				w.WriteHeader(http.StatusBadRequest)
-			}
+			router.logger.Error("espn error", "err", err.Error())
+			// TODO: check for different types of errors
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(err.Error())
+			return
 		}
 		json.NewEncoder(w).Encode(res)
 	}
