@@ -4,3 +4,4 @@
 /docker/firebase/cache
 /docker/firebase/data
 .air.toml
+example.http

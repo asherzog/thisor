@@ -42,6 +42,8 @@ type Competition struct {
 type Competitor struct {
 	HomeAway string `json:"homeAway"`
 	Team     Team   `json:"team"`
+	Winner   bool   `json:"winner"`
+	Score    string `json:"score"`
 }
 
 type Team struct {
@@ -65,15 +67,18 @@ type Schedule struct {
 }
 
 type Game struct {
-	ID   string `json:"id"`
-	Date string `json:"date"`
-	Slug string `json:"slug"`
-	Year int    `json:"year"`
-	Week int    `json:"week"`
-	Type int    `json:"type"`
-	Home Team   `json:"home"`
-	Away Team   `json:"away"`
-	Odds Odd    `json:"odds"`
+	ID        string `json:"id"`
+	Date      string `json:"date"`
+	Slug      string `json:"slug"`
+	Year      int    `json:"year"`
+	Week      int    `json:"week"`
+	Type      int    `json:"type"`
+	Home      Team   `json:"home"`
+	Away      Team   `json:"away"`
+	Winner    Team   `json:"winner"`
+	WinScore  string `json:"winScore"`
+	LoseScore string `json:"loseScore"`
+	Odds      Odd    `json:"odds"`
 }
 
 const (
@@ -161,8 +166,20 @@ func upsertGame(e Event) Game {
 		for _, c := range cm.Competitors {
 			if c.HomeAway == "home" {
 				res.Home = c.Team
+				if c.Winner {
+					res.Winner = c.Team
+					res.WinScore = c.Score
+				} else {
+					res.LoseScore = c.Score
+				}
 			} else {
 				res.Away = c.Team
+				if c.Winner {
+					res.Winner = c.Team
+					res.WinScore = c.Score
+				} else {
+					res.LoseScore = c.Score
+				}
 			}
 		}
 		for _, o := range cm.Odds {
