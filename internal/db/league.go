@@ -3,6 +3,7 @@ package db
 import (
 	"context"
 	"errors"
+	"fmt"
 	"strconv"
 
 	"cloud.google.com/go/firestore"
@@ -190,4 +191,30 @@ func (d *DB) DeleteUserFromLeague(ctx context.Context, leagueId, userId string) 
 		return nil, err
 	}
 	return &userList, nil
+}
+
+func (d *DB) UpsertWeekResults(ctx context.Context, leagueId string, week []espn.Game) ([]espn.Game, error) {
+	doc, err := d.leagueCollection().Doc(leagueId).Get(ctx)
+	if err != nil {
+		d.lg.Error("unable to fetch league", "error", err.Error())
+		return nil, err
+	}
+	var league League
+	err = doc.DataTo(&league)
+	if err != nil {
+		d.lg.Error("unable to parse league", "error", err.Error())
+		return nil, err
+	}
+	weekId := fmt.Sprintf("%d", week[0].Week)
+	league.Weeks[weekId] = week
+	_, err = d.leagueCollection().Doc(leagueId).Update(ctx, []firestore.Update{
+		{
+			Path:  "Weeks",
+			Value: league.Weeks,
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+	return league.Weeks[weekId], nil
 }

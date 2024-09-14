@@ -84,6 +84,7 @@ type Game struct {
 const (
 	BASE_API      = "https://site.api.espn.com/apis/site/v2/sports/football/nfl"
 	SCHEDULE_PATH = "/scoreboard?limit=1000&dates=20240901-20250228"
+	WEEK_PATH     = "/scoreboard?limit=100&dates=2024&seasontype=2&week="
 	ODDS_API      = "https://sports.core.api.espn.com/v2/sports/football/leagues/nfl/events/%[1]s/competitions/%[1]s/odds"
 )
 
@@ -152,6 +153,36 @@ func (c Client) GetGameOdds(id string) (*Odd, error) {
 	}
 
 	return &odds.Items[0], nil
+}
+
+func (c Client) GetWeekResults(id int) (*Schedule, error) {
+	weekApi := fmt.Sprintf("%s%s", BASE_API, WEEK_PATH)
+	resp, err := c.client.Get(fmt.Sprintf("%s%d", weekApi, id))
+	if err != nil {
+		return nil, err
+	}
+
+	defer resp.Body.Close()
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, errors.New(string(body))
+	}
+
+	var season Season
+	if err := json.Unmarshal(body, &season); err != nil {
+		return nil, err
+	}
+
+	games := []Game{}
+	for _, e := range season.Events {
+		games = append(games, upsertGame(e))
+	}
+	schedule := &Schedule{Games: games}
+	return schedule, nil
 }
 
 func upsertGame(e Event) Game {

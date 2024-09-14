@@ -16,14 +16,33 @@
         {{$pick := index $.w $val.ID }}
         {{$ws := index $.winScore $val.ID }}
         {{$ls := index $.loseScore $val.ID }}
+        {{$rw := index $.resultWinner $val.ID }}
             <div {{if $.isLocked}}id="locked"{{end}} class="card">
                 <div class="row g-0 parentDiv">
                     <div id="pick-{{$val.Home.ID}}" data-user="{{$.sub}}" data-game="{{$val.ID}}" data-value="{{$val.Home.ID}}" data-week="{{$val.Week}}" {{if eq $pick $val.Home.ID}}class="col-sm-6 hometeam screen childDiv pick selection" {{else}} class="col-sm-6 hometeam screen childDiv"{{end}}>
+                        {{if eq $rw $val.Home.ID}}
+                        <span class="badge rounded-pill bg-success">
+                            W
+                        </span>
+                        {{else if ne $rw "n/a"}}
+                        <span class="badge rounded-pill bg-danger">
+                            L
+                        </span>
+                        {{end}}
                         <img src="{{$val.Home.Logo}}" />
                         <p>Home</p>
                     </div>
                     <div  id="pick-{{$val.Away.ID}}" data-user="{{$.sub}}" data-game="{{$val.ID}}" data-value="{{$val.Away.ID}}" data-week="{{$val.Week}}" {{if eq $pick $val.Away.ID}}class="col-sm-6 awayteam screen childDiv selection" {{else}} class="col-sm-6 awayteam screen childDiv"{{end}}>
                         <img src="{{$val.Away.Logo}}" />
+                        {{if eq $rw $val.Away.ID}}
+                        <span class="badge rounded-pill bg-success">
+                            W
+                        </span>
+                        {{else if ne $rw "n/a"}}
+                        <span class="badge rounded-pill bg-danger">
+                            L
+                        </span>
+                        {{end}}
                         <p>Away</p>
                     </div>
                 </div>
