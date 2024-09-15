@@ -1,6 +1,7 @@
 {{define "schedule"}}
 <html>
 <head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js" type="text/javascript"></script>
     <link href="/static/css/app.css" rel="stylesheet">
     <script src="/static/js/user.js"> </script>
 </head>
@@ -13,11 +14,12 @@
         <div id="overlay">Locked until games start</div>
         {{end}}
         {{range $val := .schedule.Games}}
-        {{$pick := index $.w $val.ID }}
+        {{$pick := index $.selection $val.ID }}
         {{$ws := index $.winScore $val.ID }}
         {{$ls := index $.loseScore $val.ID }}
         {{$rw := index $.resultWinner $val.ID }}
-            <div {{if $.isLocked}}id="locked"{{end}} class="card">
+        {{$isWin := index $.isWin $val.ID }}
+            <div {{if $.isLocked}}id="locked"{{end}} {{if eq $isWin "true"}} class="card winner" {{else if eq $isWin "false"}} class="card loser" {{else}} class="card" {{end}}>
                 <div class="row g-0 parentDiv">
                     <div id="pick-{{$val.Home.ID}}" data-user="{{$.sub}}" data-game="{{$val.ID}}" data-value="{{$val.Home.ID}}" data-week="{{$val.Week}}" {{if eq $pick $val.Home.ID}}class="col-sm-6 hometeam screen childDiv pick selection" {{else}} class="col-sm-6 hometeam screen childDiv"{{end}}>
                         {{if eq $rw $val.Home.ID}}
@@ -48,8 +50,10 @@
                 </div>
                 <div class="row g-0 pad">
                     <p>{{$val.Date}}</p>
+                    {{if ne $val.Odds.Details ""}}
                     <p>{{$val.Odds.Details}}</p>
                     <p>O/U: {{$val.Odds.OverUnder}}</p>
+                    {{end}}
                 </div>
                 {{if eq $val.ID $.last}}
                 <label for="win">win score:</label>
@@ -57,6 +61,9 @@
 
                 <label for="lose">lose score:</label>
                 <input type="text" id="lose" name="lose" value="{{$ls}}" required>
+                {{end}}
+                {{if eq $isWin "true"}}
+                <i class="bi bi-check-circle-fill"></i>
                 {{end}}
             </div>
         {{end}}

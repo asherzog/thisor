@@ -64,10 +64,11 @@ func (web *Web) Week(auth *authenticator.Authenticator) http.HandlerFunc {
 			return week.Games[i].Date < week.Games[j].Date
 		})
 
-		prof["w"] = map[string]string{}
+		prof["selection"] = map[string]string{}
 		prof["winScore"] = map[string]int{}
 		prof["loseScore"] = map[string]int{}
 		prof["resultWinner"] = map[string]string{}
+		prof["isWin"] = map[string]string{}
 		for _, g := range week.Games {
 			rw, _ := prof["resultWinner"].(map[string]string)
 			if g.Winner.ID != "" {
@@ -79,9 +80,9 @@ func (web *Web) Week(auth *authenticator.Authenticator) http.HandlerFunc {
 			for _, p := range user.Picks {
 				if g.ID == p.GameID {
 					prof["isLocked"] = p.IsLocked
-					w, _ := prof["w"].(map[string]string)
+					w, _ := prof["selection"].(map[string]string)
 					w[p.GameID] = p.Selection.ID
-					prof["w"] = w
+					prof["selection"] = w
 					if p.WinScore > 0 {
 						ws, _ := prof["winScore"].(map[string]int)
 						ls, _ := prof["loseScore"].(map[string]int)
@@ -90,6 +91,15 @@ func (web *Web) Week(auth *authenticator.Authenticator) http.HandlerFunc {
 						prof["winScore"] = ws
 						prof["loseScore"] = ls
 					}
+					isWin, _ := prof["isWin"].(map[string]string)
+					isWin[p.GameID] = "n/a"
+					if g.Winner.ID != "" {
+						isWin[p.GameID] = "false"
+						if p.Selection.ID == g.Winner.ID {
+							isWin[p.GameID] = "true"
+						}
+					}
+					prof["isWin"] = isWin
 				}
 			}
 		}
