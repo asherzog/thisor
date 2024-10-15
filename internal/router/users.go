@@ -46,17 +46,16 @@ func (router Router) GetUser() http.HandlerFunc {
 func (router Router) PostUser() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var user db.User
-		err := r.ParseForm()
+		decoder := json.NewDecoder(r.Body)
+		err := decoder.Decode(&user)
 		if err != nil {
-			decoder := json.NewDecoder(r.Body)
-			err := decoder.Decode(&user)
+			err = r.ParseForm()
 			if err != nil {
 				router.logger.Error("invalid user request", "err", err.Error())
 				w.WriteHeader(http.StatusBadRequest)
 				json.NewEncoder(w).Encode(user)
 				return
 			}
-		} else {
 			user.ID = r.FormValue("id")
 			user.Name = r.FormValue("name")
 		}

@@ -68,15 +68,23 @@ func (web *Web) Week(auth *authenticator.Authenticator) http.HandlerFunc {
 		prof["winScore"] = map[string]int{}
 		prof["loseScore"] = map[string]int{}
 		prof["resultWinner"] = map[string]string{}
+		prof["resultWinScore"] = map[string]string{}
+		prof["resultLoseScore"] = map[string]string{}
 		prof["isWin"] = map[string]string{}
 		for _, g := range week.Games {
 			rw, _ := prof["resultWinner"].(map[string]string)
+			rwscore, _ := prof["resultWinScore"].(map[string]string)
+			rlscore, _ := prof["resultLoseScore"].(map[string]string)
 			if g.Winner.ID != "" {
 				rw[g.ID] = g.Winner.ID
+				rwscore[g.ID] = g.WinScore
+				rlscore[g.ID] = g.LoseScore
 			} else {
 				rw[g.ID] = "n/a"
 			}
 			prof["resultWinner"] = rw
+			prof["resultWinScore"] = rwscore
+			prof["resultLoseScore"] = rlscore
 			for _, p := range user.Picks {
 				if g.ID == p.GameID {
 					prof["isLocked"] = p.IsLocked

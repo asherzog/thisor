@@ -49,7 +49,9 @@ func (router Router) GetWeek() http.HandlerFunc {
 			w.WriteHeader(http.StatusBadRequest)
 			json.NewEncoder(w).Encode("invalid week")
 			return
+
 		}
+		router.PostSchedule()
 		res, err := router.db.GetWeek(r.Context(), id)
 		if err != nil {
 			router.logger.Error("invalid week", "id", s)

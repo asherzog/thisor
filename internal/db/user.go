@@ -8,10 +8,15 @@ import (
 )
 
 type User struct {
-	ID      string   `json:"id"`
-	Name    string   `json:"name"`
-	Picks   []Pick   `json:"picks"`
-	Leagues []League `json:"leagues"`
+	ID      string       `json:"id"`
+	Name    string       `json:"name"`
+	Picks   []Pick       `json:"picks"`
+	Leagues []UserLeague `json:"leagues"`
+}
+
+type UserLeague struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
 }
 
 type UserList struct {

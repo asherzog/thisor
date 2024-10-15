@@ -18,6 +18,8 @@
         {{$ws := index $.winScore $val.ID }}
         {{$ls := index $.loseScore $val.ID }}
         {{$rw := index $.resultWinner $val.ID }}
+        {{$rwScore := index $.resultWinScore $val.ID }}
+        {{$rlScore := index $.resultLoseScore $val.ID }}
         {{$isWin := index $.isWin $val.ID }}
             <div {{if $.isLocked}}id="locked"{{end}} {{if eq $isWin "true"}} class="card winner" {{else if eq $isWin "false"}} class="card loser" {{else}} class="card" {{end}}>
                 <div class="row g-0 parentDiv">
@@ -55,6 +57,9 @@
                     <p>O/U: {{$val.Odds.OverUnder}}</p>
                     {{end}}
                 </div>
+                {{if ne $rw "n/a"}}
+                <p>Score: {{$rwScore}} - {{$rlScore}}</p>
+                {{end}}
                 {{if eq $val.ID $.last}}
                 <label for="win">win score:</label>
                 <input type="text" id="win" name="win" value="{{$ws}}" required>

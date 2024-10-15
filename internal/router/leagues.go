@@ -38,17 +38,16 @@ func (router Router) GetLeague() http.HandlerFunc {
 func (router Router) AddUserToLeague() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var user db.User
-		err := r.ParseForm()
+		decoder := json.NewDecoder(r.Body)
+		err := decoder.Decode(&user)
 		if err != nil {
-			decoder := json.NewDecoder(r.Body)
-			err := decoder.Decode(&user)
+			err = r.ParseForm()
 			if err != nil {
-				router.logger.Error("invalid league request", "err", err.Error())
+				router.logger.Error("invalid user request", "err", err.Error())
 				w.WriteHeader(http.StatusBadRequest)
-				json.NewEncoder(w).Encode(ErrorReturn{Status: http.StatusBadRequest, Msg: err.Error()})
+				json.NewEncoder(w).Encode(user)
 				return
 			}
-		} else {
 			user.ID = r.FormValue("id")
 		}
 

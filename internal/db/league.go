@@ -85,7 +85,7 @@ func (d *DB) CreateLeague(ctx context.Context, l League) (*League, error) {
 		return nil, err
 	}
 
-	admin.Leagues = append(admin.Leagues, l)
+	admin.Leagues = append(admin.Leagues, UserLeague{ID: l.ID, Name: l.Name})
 	_, err = d.userCollection().Doc(admin.ID).Update(ctx, []firestore.Update{
 		{
 			Path:  "Leagues",
@@ -146,7 +146,7 @@ func (d *DB) AddUserToLeague(ctx context.Context, leagueId, userId string) (*[]U
 		return nil, err
 	}
 
-	user.Leagues = append(user.Leagues, league)
+	user.Leagues = append(user.Leagues, UserLeague{ID: league.ID, Name: league.Name})
 	_, err = d.userCollection().Doc(user.ID).Update(ctx, []firestore.Update{
 		{
 			Path:  "Leagues",
